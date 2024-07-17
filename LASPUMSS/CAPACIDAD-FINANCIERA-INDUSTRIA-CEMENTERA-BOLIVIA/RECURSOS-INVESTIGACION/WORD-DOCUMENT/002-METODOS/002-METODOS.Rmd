@@ -1,0 +1,26 @@
+# Sustento teórico {#MarcoTeorico}
+
+Iniciando con el marco conceptual de los métodos aplicados para determinar la capacidad financiera del sector cementero de Bolivia, se nombra al denominado como “capacidad de pago”, sobre el cual no existe un consenso genérico o procedimiento único de como medir dicha magnitud, pero este puede entenderse como:
+
+::: {custom-style="Citas Largas"}
+
+La probabilidad existente de que una empresa o un individuo puedan incumplir con el pago de sus deudas con uno o varios acreedores. Esta magnitud se usa como un indicador que trata de medir la solvencia de la compañía frente a sus deudas, capacitando para la toma de decisiones en relaciones de endeudamiento con los distintos acreedores. Es un indicador muy utilizado, habitualmente, en el sector bancario. La capacidad que tiene este para medir el rating crediticio de una persona, le lleva a ser utilizado de forma reiterada para la evaluación en la aprobación, o negación, de créditos. [@CAPACIDAD-PAGO-COLL]
+
+::: 
+
+<!-- Capacidad de endeudamiento -->
+
+Por lo tanto, en el presente trabajo la capacidad de pago equivale a la solvencia financiera observada o la capacidad de hacer frente a sus obligaciones financieras efectivamente registradas, es decir, esta magnitud refleja el comportamiento de los pagos histórico del deudor o industria. Por otro lado, se tiene el concepto de “capacidad de endeudamiento” que según @CAPACIDAD-ENDEUDAMIENTO-COLL “La capacidad de endeudamiento es la cantidad de deuda máxima que puede asumir un individuo o empresa sin llegar a tener problemas de solvencia”, donde dicha capacidad puede restringirse a la capacidad de generación de flujos de caja positivos, donde si la cuota de gastos financieros sobrepasa este monto la industria tendría problemas para hacer frente a sus obligaciones.
+
+
+# Métodos {#Metodos}
+
+Continuando con los detalles técnicos de la presente investigación se circunscribió al estudio del sector o industria cementera del periodo 31-01-2007 al 31-12-2023, donde los datos utilizados de dicha industria cementera corresponden a agrupaciones por unidad de tiempo de los estados financieros de SOBOCE, FANCESA y ITACAMBA que representan a las principales empresas del sector en el país. Ahora bien, la capacidad de pago o comportamiento de pagos del sector fue representado por la comparación de las siguientes magnitudes:
+
+$$ \text{%} = \frac{Gastos \text{ } financieros}{Ingresos \text{ } operacionales}$$
+
+Seguido de la capacidad de endeudamiento que fue representado por el flujo de efectivo generado en un periodo, donde dicho efectivo se debe entender como aquellos activos más líquidos que pueden ser convertidos en dinero en un periodo menor a un mes:
+
+$$Flujos \text{ } de \text{ } Efectivo =  \vartriangle{Activo} +  \vartriangle{Pasivo} +  \vartriangle{Patrimonio}$$
+
+Así también, la frecuencia de todas las series de tiempo es de intervalo mensual a menos que se señale lo contrario, donde los valores perdidos se interpolan por el algoritmo de intercepción de  @forecast2008.

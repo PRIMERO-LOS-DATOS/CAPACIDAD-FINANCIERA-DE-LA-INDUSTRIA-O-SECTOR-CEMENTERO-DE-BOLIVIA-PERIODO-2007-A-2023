@@ -1,0 +1,6 @@
+
+## INTRODUCCIÓN
+
+
+La presente investigación parte de la idea de determinar la solvencia financiera del sector o industria cementera de Bolivia, es decir, hasta que nivel haciende la capacidad de dicha industria para hacer frente a sus obligaciones, para lo cual en primer término se delimita el marco teórico con el objeto de restringir el concepto de solvencia financiera asociada a la capacidad de pago y comportamiento de pagos de cargos financieros del periodo 2007-01-31 a 2023-12-31. Respecto a la fuente de los datos corresponden a los estados financieros de las principales cementeras del país (SOBOCE, FANCESA y ITACAMBA). Los resultados son presentados por medio de series de tiempo y estadísticas de resumen, donde los cálculos son procesados mediante funciones construidas en el lenguaje de programación R, con el fin de determinar hasta qué punto podría endeudarse la industria restringido por sus flujos de efectivo generado por periodo, así también, se presenta algunos hechos particulares encontrados.
+

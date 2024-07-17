@@ -1,0 +1,107 @@
+```{r, results='hide'}
+sapply( list.files('ALGOTIMOS-MODELOS/HANDLES', full.names=TRUE, pattern='\\.[rR]$'), source )
+
+require(patchwork)
+require(magick)
+require(ggplot2)
+require(dplyr)
+require(huxtable)
+
+datBase <- 
+    openxlsx::read.xlsx('LASPUMSS/CAPACIDAD-FINANCIERA-INDUSTRIA-CEMENTERA-BOLIVIA/DATA/datForArticle.xlsx')
+
+
+datBase <- 
+    datBase %>% 
+    filter(TIPO_DE_ENTIDAD %in% c('SBC', 'FAN', 'ITA')) %>% 
+    filter(as.numeric(format(as.Date(FECHA), format='%Y'))>=2007) %>% 
+    filter(as.numeric(format(as.Date(FECHA), format='%Y'))<=2023) %>% 
+    as.data.frame() 
+
+datBase <- 
+    datBase %>% 
+    select(FECHA, TIPO_DE_ENTIDAD, ACTIVO, PASIVO, PATRIMONIO) %>% 
+    handles$getDat_Norm_V1() 
+
+datBase <- getTsFromDat(datBase)
+
+```
+
+
+::: {custom-style="Titulo 2 enum"}
+Composición de partidas principales de SOBOCE, FANCESA y ITACAMBA – Expresado en bolivianos
+:::
+
+
+```{r, fig.height=2.81, fig.width=6.02, fig.width=6.02, fig.cap='Composición histórica de partidas de SOBOCE, periodo contenido 2007-01-31 – 2023-12-31'}
+datAux <- datBase %>% filter(TIPO_DE_ENTIDAD=='SBC')
+
+p <- 
+    datAux %>% ggplot() + 
+    geom_line(aes(x=as.Date(FECHA), y=ACTIVO, color='ACTIVO')) +
+    geom_line(aes(x=as.Date(FECHA), y=PASIVO, color='PASIVO')) +
+    geom_line(aes(x=as.Date(FECHA), y=PATRIMONIO, color='PATRIMONIO')) +
+    
+    labs(color='') +
+    ylab('Bolivianos') +
+    xlab('Tiempo') + 
+    scale_y_continuous(labels = function(x) format(x, big.mark = " ", scientific = FALSE)) +
+    theme(legend.position="bottom", legend.text=element_text(size=8)) 
+
+handles$renderPlotBasic(p, width = 6, height = 4)
+```
+
+::: {custom-style="NotasTablasImagenes"}
+**Fuente:** Elaboración propia. 
+:::
+
+
+```{r, fig.height=2.81, fig.width=6.02, fig.cap='Composición histórica de partidas de FANCESA, periodo contenido 2007-01-31 – 2023-12-31'}
+datAux <- datBase %>% filter(TIPO_DE_ENTIDAD=='FAN')
+
+p <- 
+    datAux %>% ggplot() + 
+    geom_line(aes(x=as.Date(FECHA), y=ACTIVO, color='ACTIVO')) +
+    geom_line(aes(x=as.Date(FECHA), y=PASIVO, color='PASIVO')) +
+    geom_line(aes(x=as.Date(FECHA), y=PATRIMONIO, color='PATRIMONIO')) +
+    
+    labs(color='') +
+    ylab('Bolivianos') +
+    xlab('Tiempo') + 
+    scale_y_continuous(labels = function(x) format(x, big.mark = " ", scientific = FALSE)) +
+    theme(legend.position="bottom", legend.text=element_text(size=8)) 
+
+handles$renderPlotBasic(p, width = 6, height = 4)
+```
+
+::: {custom-style="NotasTablasImagenes"}
+**Fuente:** Elaboración propia. 
+:::
+
+
+```{r, fig.height=2.81, fig.width=6.02, fig.cap='Composición histórica de partidas de ITACAMBA, periodo contenido 2007-31-01 – 2023-12-31'}
+datAux <- 
+    datBase %>% 
+    filter(TIPO_DE_ENTIDAD=='ITA', 
+           !is.na(ACTIVO), 
+           !is.na(PASIVO), 
+           !is.na(PATRIMONIO) ) 
+
+p <- 
+    datAux %>% ggplot() + 
+    geom_line(aes(x=as.Date(FECHA), y=ACTIVO, color='ACTIVO')) +
+    geom_line(aes(x=as.Date(FECHA), y=PASIVO, color='PASIVO')) +
+    geom_line(aes(x=as.Date(FECHA), y=PATRIMONIO, color='PATRIMONIO')) +
+    
+    labs(color='') +
+    ylab('Bolivianos') +
+    xlab('Tiempo') + 
+    scale_y_continuous(labels = function(x) format(x, big.mark = " ", scientific = FALSE)) +
+    theme(legend.position="bottom", legend.text=element_text(size=8)) 
+
+handles$renderPlotBasic(p, width = 6, height = 4)
+```
+
+::: {custom-style="NotasTablasImagenes"}
+**Fuente:** Elaboración propia. 
+:::

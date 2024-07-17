@@ -1,0 +1,147 @@
+```{r results='hide'}
+# FUNCIONES PARA REDERZACION PERSONALIZADA DEL PROYECTO
+rootRSourse <- 'LASPUMSS/CAPACIDAD-FINANCIERA-INDUSTRIA-CEMENTERA-BOLIVIA/'
+sapply( list.files(paste0(rootRSourse,"R"), full.names=TRUE, pattern='\\.[rR]$'), source )
+
+# FUNCIONES MODELO CAMEL
+rootRSourse <- 'ALGOTIMOS-MODELOS/FLUJOS-DE-EFECTIVO'
+sapply( list.files(rootRSourse, full.names=TRUE, pattern='\\.[rR]$'), source )
+rootRSourse <- 'ALGOTIMOS-MODELOS/HANDLES'
+sapply( list.files(rootRSourse, full.names=TRUE, pattern='\\.[rR]$'), source )
+
+require(dplyr)
+require(stringr)
+require(glue)
+require(ggplot2)
+require(patchwork)
+require(knitr)
+require(kableExtra)
+
+datBase <- 
+    openxlsx::read.xlsx('LASPUMSS/CAPACIDAD-FINANCIERA-INDUSTRIA-CEMENTERA-BOLIVIA/DATA/datForArticle.xlsx')
+
+datBase <- 
+    datBase %>% 
+    filter(TIPO_DE_ENTIDAD %in% c('SBC','FAN', 'ITA')) %>% # filtrar a mayor de la gestión del 2011
+    filter(as.numeric(format(as.Date(FECHA), format='%Y'))>=2007) %>% 
+    filter(as.numeric(format(as.Date(FECHA), format='%Y'))<=2023) %>% 
+    as.data.frame() 
+
+dat <- 
+    datBase %>%
+    replace(is.na(.), 0) %>% 
+    mutate(INGRESOS_OPERACIONALES = INGRESOS_OPERACIONALES+INGRESOS_OPERATIVOS) %>% 
+    group_by(FECHA) %>% 
+    summarise_if(is.numeric, sum) %>% 
+    mutate(TIPO_DE_ENTIDAD=rep('TOTAL_INDUSTRIA',n() )) %>%
+    relocate(TIPO_DE_ENTIDAD, .before = 2) %>% 
+    handles$getDat_Norm_V1() 
+
+dat <- 
+    dat %>% 
+    mutate(HISTORIAL_PAGO=abs(GASTOS_FINANCIEROS)/INGRESOS_OPERACIONALES)
+
+dat <- 
+    dat %>% 
+    mutate(FECHA=as.Date(FECHA),
+           TIPO_DE_ENTIDAD=TIPO_DE_ENTIDAD,
+           ACTIVO_DISPONIBILIDADES=DISPONIBILIDADES,
+           ACTIVO=ACTIVO,
+           PASIVO=PASIVO,
+           PATRIMONIO=PATRIMONIO) %>% 
+    select(FECHA, 
+           TIPO_DE_ENTIDAD, 
+           ACTIVO_DISPONIBILIDADES, 
+           ACTIVO, 
+           PASIVO,
+           PATRIMONIO,
+           GASTOS_FINANCIEROS,
+           INGRESOS_OPERACIONALES,
+           HISTORIAL_PAGO) %>% 
+    as.data.frame()
+
+dat <- getTsFromDat(dat)
+
+# FLUJOS DE EFECTIVO HISTORICO
+datCashFlow <- getDatCashFlow(dat, desagregados = FALSE)
+
+rootProyectMainAux <- 'LASPUMSS/CAPACIDAD-FINANCIERA-INDUSTRIA-CEMENTERA-BOLIVIA/'
+datIdsNamesStatsTables <-  
+    openxlsx::read.xlsx( paste0(rootProyectMainAux,'ASSETS/datIdsNamesCamelIndicadores.xlsx') )
+
+datIdsNamesStatsPlots <-  
+    openxlsx::read.xlsx( paste0(rootProyectMainAux,'ASSETS/datIdsNamesCamelIndicadoresPlots.xlsx') )
+
+#############################################################################
+
+dat$CAPACIDAD_ENDUDAMIENTO <-  datCashFlow$FLUJO_EFECTIVO_ACTUAL / dat$INGRESOS_OPERACIONALES
+
+```
+
+
+\newpage
+::: {custom-style="Titulo 2 enum"}
+Variables presentadas en el articulo
+:::
+
+- $V1 =$ ACTIVO
+- $V2 =$ PASIVO
+- $V3 =$ PATRIMONIO
+
+```{r}
+ids <- c('FECHA',
+         'TIPO_DE_ENTIDAD',
+         'ACTIVO',
+         'PASIVO', 
+         'PATRIMONIO')
+
+datForRender <- 
+    dat %>% 
+    select(all_of(ids)) %>% 
+    as.data.frame()
+
+names(datForRender) <- c('FECHA', 'TIPO DE ENTIDAD', 'V1', 'V2','V3')
+
+handles$renderTableBasic(datForRender, fontSize = 7) %>%
+    set_number_format(0, row=everywhere, col=1) %>% 
+    set_number_format(0, row=1, col=everywhere)
+
+```
+
+::: {custom-style="NotasTablasImagenes"}
+Fuente: Elaboración propia.
+:::
+
+
+\newpage
+
+
+- $V4 =$ GASTOS FINANCIEROS
+- $V5 =$ INGRESOS OPERACIONALES
+- $V6 =$ ACTIVO - DISPONIBILIDADES
+
+```{r}
+ids <- c('FECHA',
+         'TIPO_DE_ENTIDAD',
+         'GASTOS_FINANCIEROS',
+         'INGRESOS_OPERACIONALES',
+         'ACTIVO_DISPONIBILIDADES'
+         )
+
+datForRender <- 
+    dat %>% 
+    select(all_of(ids)) %>% 
+    as.data.frame()
+
+names(datForRender) <- c('FECHA', 'TIPO DE ENTIDAD', 'V4', 'V5','V6')
+
+handles$renderTableBasic(datForRender, fontSize = 7) %>%
+    set_number_format(0, row=everywhere, col=1) %>% 
+    set_number_format(0, row=1, col=everywhere)
+
+```
+
+::: {custom-style="NotasTablasImagenes"}
+Fuente: Elaboración propia.
+:::
+

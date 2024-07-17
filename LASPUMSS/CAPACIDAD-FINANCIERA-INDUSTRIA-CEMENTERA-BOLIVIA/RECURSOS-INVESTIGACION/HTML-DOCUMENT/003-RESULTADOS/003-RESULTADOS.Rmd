@@ -1,0 +1,243 @@
+```{r results='hide'}
+# FUNCIONES PARA REDERZACION PERSONALIZADA DEL PROYECTO
+rootRSourse <- 'LASPUMSS/CAPACIDAD-FINANCIERA-INDUSTRIA-CEMENTERA-BOLIVIA/'
+sapply( list.files(paste0(rootRSourse,"R"), full.names=TRUE, pattern='\\.[rR]$'), source )
+
+# FUNCIONES MODELO CAMEL
+rootRSourse <- 'ALGOTIMOS-MODELOS/FLUJOS-DE-EFECTIVO'
+sapply( list.files(rootRSourse, full.names=TRUE, pattern='\\.[rR]$'), source )
+rootRSourse <- 'ALGOTIMOS-MODELOS/HANDLES'
+sapply( list.files(rootRSourse, full.names=TRUE, pattern='\\.[rR]$'), source )
+
+require(dplyr)
+require(stringr)
+require(glue)
+require(ggplot2)
+require(patchwork)
+require(knitr)
+require(kableExtra)
+
+datBase <- 
+    openxlsx::read.xlsx('LASPUMSS/CAPACIDAD-FINANCIERA-INDUSTRIA-CEMENTERA-BOLIVIA/DATA/datForArticle.xlsx')
+
+datBase <- 
+    datBase %>% 
+    filter(TIPO_DE_ENTIDAD %in% c('SBC','FAN', 'ITA')) %>% # filtrar a mayor de la gestión del 2011
+    filter(as.numeric(format(as.Date(FECHA), format='%Y'))>=2007) %>% 
+    filter(as.numeric(format(as.Date(FECHA), format='%Y'))<=2023) %>% 
+    as.data.frame() 
+
+dat <- 
+    datBase %>%
+    replace(is.na(.), 0) %>% 
+    mutate(INGRESOS_OPERACIONALES = INGRESOS_OPERACIONALES+INGRESOS_OPERATIVOS) %>% 
+    group_by(FECHA) %>% 
+    summarise_if(is.numeric, sum) %>% 
+    mutate(TIPO_DE_ENTIDAD=rep('TOTAL_INDUSTRIA',n() )) %>%
+    relocate(TIPO_DE_ENTIDAD, .before = 2) %>% 
+    handles$getDat_Norm_V1() 
+
+dat <- 
+    dat %>% 
+    mutate(HISTORIAL_PAGO=abs(GASTOS_FINANCIEROS)/INGRESOS_OPERACIONALES)
+
+dat <- 
+    dat %>% 
+    mutate(FECHA=as.Date(FECHA),
+           TIPO_DE_ENTIDAD=TIPO_DE_ENTIDAD,
+           ACTIVO_DISPONIBILIDADES=DISPONIBILIDADES,
+           ACTIVO=ACTIVO,
+           PASIVO=PASIVO,
+           PATRIMONIO=PATRIMONIO) %>% 
+    select(FECHA, 
+           TIPO_DE_ENTIDAD, 
+           ACTIVO_DISPONIBILIDADES, 
+           ACTIVO, 
+           PASIVO,
+           PATRIMONIO,
+           GASTOS_FINANCIEROS,
+           INGRESOS_OPERACIONALES,
+           HISTORIAL_PAGO) %>% 
+    as.data.frame()
+
+dat <- getTsFromDat(dat)
+
+# FLUJOS DE EFECTIVO HISTORICO
+datCashFlow <- getDatCashFlow(dat, desagregados = FALSE)
+
+rootProyectMainAux <- 'LASPUMSS/CAPACIDAD-FINANCIERA-INDUSTRIA-CEMENTERA-BOLIVIA/'
+datIdsNamesStatsTables <-  
+    openxlsx::read.xlsx( paste0(rootProyectMainAux,'ASSETS/datIdsNamesCamelIndicadores.xlsx') )
+
+datIdsNamesStatsPlots <-  
+    openxlsx::read.xlsx( paste0(rootProyectMainAux,'ASSETS/datIdsNamesCamelIndicadoresPlots.xlsx') )
+
+#############################################################################
+
+dat$CAPACIDAD_ENDUDAMIENTO <-  datCashFlow$FLUJO_EFECTIVO_ACTUAL / dat$INGRESOS_OPERACIONALES
+
+```
+
+## RESULTADOS
+
+### Capacidad de endeudamiento
+
+Los flujos de efectivo generados por la industria cementera de Bolivia por actividades asociadas a activos, pasivos y patrimonio a lo largo del tiempo se ilustran a continuación.
+
+
+```{r}
+captionTable <- 'Tendencia y estadísticas de resumen de flujos de efectivo y equivalentes de efectivo generados por activo (FGPA), pasivo (FGPP) y patrimonio (FGPPAT), periodo contenido 2007-01-31 – 2023-12-31 \n (Expresado en bolivianos)'
+
+ids <- c("FLUJO_EFECTIVO_POR_ACTIVO",
+         "FLUJO_EFECTIVO_POR_PASIVO",
+         "FLUJO_EFECTIVO_POR_PATRIMONIO",
+         "FLUJO_EFECTIVO_ACTUAL")
+
+colNamesRender <- c('TIPO_DE_ENTIDAD', 
+                    'PROMEDIO', 
+                    'COEFICIENTE_DE_VARIACION',
+                    'MINIMO',
+                    'MAXIMO')
+
+changeColNamesRender<- c('TIPO_DE_ENTIDAD', 
+                         'PROMEDIO', 
+                         'CV',
+                         'MINIMO',
+                         'MAXIMO')
+
+listResult <- 
+    handles$getListStatsOverviewByIdsNames(ids = ids, 
+                                           datNorm = datCashFlow, 
+                                           datIdsNames = datIdsNamesStatsTables)
+
+listPlots <- 
+    handles$getListPlotsAccoounts(listResult = listResult, 
+                                  legend_element_text = 12.5,
+                                  x_y_element_text = 14, 
+                                  datIdsNames = datIdsNamesStatsPlots)
+
+listTablesRender <- 
+    handles$renderListTablesAccountsWordDocument_v2(ids=ids,
+                                                    listResult = listResult, 
+                                                    nSepEnt = 1, 
+                                                    fontSize = 8, 
+                                                    colNamesRender = colNamesRender,
+                                                    changeColNamesRender = changeColNamesRender,
+                                                    captionTable=captionTable, 
+                                                    digitsColumns=4,
+                                                    set_top_padding = 5,
+                                                    set_bottom_padding = 5)
+
+x1_conclusiones <- round(listResult$FLUJO_EFECTIVO_ACTUAL$bestPromedio, 2)
+x2_conclusiones <- round(mean(dat$HISTORIAL_PAGO, na.rm = T)*100, 2)
+```
+
+
+
+```{r, fig.id='valEntFlujosHistoricosFigura', fig.height=6, fig.width=6.02}
+p <- wrap_plots(listPlots, ncol = 1)
+handles$renderPlotBasic(p, width = 10, height = 15)
+```
+
+::: {custom-style="NotasTablasImagenes"}
+Fuente: Elaboración propia.
+:::
+
+
+Donde se aprecia que los egresos de efectivo corresponden principalmente a actividades de activos, que se puede correlacionar con la partida de activos fijos que debido a la naturaleza del sector cementero incrementan periodo tras periodo, es decir, a mayor activo fijo (propiedades, plantas, terrenos, maquinarias, mobiliarios, equipos de transporte, etc) mayor será la capacidad de producción, que de la mano de una diligente administración repercutirá en mayores ingresos operacionales.
+
+Continuando con las fuentes de financiamiento, el sector en promedio es financiado en mayor medida por pasivos, teniendo las siguientes puntualidades:
+
+- SOBOCE y FANCESA en la mayor parte de sus periodos fueron principalmente financiados por actividades asociadas al patrimonio.
+- El aparente sesgo de estos resultados puede atribuirse, en primera instancia a que la empresa ITACAMBA es principalmente financiada en sus resultados históricos por sus pasivos y no por el patrimonio.
+- El segundo elemento es que se observa que en los últimos periodos el sector en general a aumentado su posición en pasivos y una disminución en activos fijos.
+
+
+Ahora bien, con los datos se señala que la industria cementera de Bolivia posee en promedio un flujo de efectivo mensual de Bs.- `r round(listResult$FLUJO_EFECTIVO_ACTUAL$bestPromedio, 2)`, es decir, si los cargos financieros mensuales del sector sobrepasan este umbral podría empezar a tener problemas de solvencia, manteniendo constante otros aspectos de ingeniería financiera como tasas variables, derivados, etc.
+
+
+```{r, tab.id='valEntFlujosHistoricosTabla', tab.align='center'}
+listTablesRender
+```
+
+::: {custom-style="NotasTablasImagenes"}
+Fuente: Elaboración propia.
+:::
+
+
+### Comportamiento de pagos
+
+Continuando con el comportamiento de pagos del sector, entendida como la relación entre gastos financieros respecto a los ingresos operacionales, estos se ilustran en la siguiente figura:
+
+```{r, fig.id='hisPago', fig.height=4, fig.width=6.02}
+p <- 
+    dat %>% 
+    ggplot() + 
+    geom_line(aes(x=as.Date(FECHA), y=HISTORIAL_PAGO, color=TIPO_DE_ENTIDAD), size=1.3) +
+
+    scale_color_manual(values=c('orange')) +
+    
+    
+    labs(color='') +
+    ylab('Gastos Financieros / Ingresos Operacionales') +
+    xlab('Tiempo') + 
+    scale_y_continuous(labels = function(x) format(x, big.mark = " ", scientific = FALSE)) +
+    theme(legend.position="bottom", legend.text=element_text(size=8)) 
+
+handles$renderPlotBasic(p, width = 6, height = 4)
+```
+
+::: {custom-style="NotasTablasImagenes"}
+Fuente: Elaboración propia.
+:::
+
+Donde los gastos financieros de la industria en general representan en promedio el `r round(mean(dat$HISTORIAL_PAGO, na.rm = T)*100, 2)`% mensual sobre los ingresos operacionales, teniendo su pico más alto en la gestión 2020 alcanzando el `r round(max(dat$HISTORIAL_PAGO, na.rm = T)*100, 2)`%
+
+```{r}
+captionTable <- 'Tendencia y estadísticas del comportamiento de pagos de la industria cementera de Bolivia, periodo contenido 2007-01-31 – 2023-12-31 \n (Expresado en tanto por uno)'
+
+ids <- c("HISTORIAL_PAGO")
+
+colNamesRender <- c('TIPO_DE_ENTIDAD', 
+                    'PROMEDIO', 
+                    'COEFICIENTE_DE_VARIACION',
+                    'MINIMO',
+                    'MAXIMO', 
+                    'TENDENCIA_MCO',
+                    'PROBABILIDAD_T_TENDENCIA_MCO')
+
+changeColNamesRender<- c('TIPO_DE_ENTIDAD', 
+                         'PROMEDIO', 
+                         'CV',
+                         'MINIMO',
+                         'MAXIMO', 
+                         'TENDENCIA',
+                         'P(t)')
+
+listResult <- 
+    handles$getListStatsOverviewByIdsNames(ids = ids, 
+                                           datNorm = dat, 
+                                           datIdsNames = datIdsNamesStatsTables)
+
+
+listTablesRender <- 
+    handles$renderListTablesAccountsWordDocument_v2(ids=ids,
+                                                    listResult = listResult, 
+                                                    nSepEnt = 1, 
+                                                    fontSize = 8, 
+                                                    colNamesRender = colNamesRender,
+                                                    changeColNamesRender = changeColNamesRender,
+                                                    captionTable=captionTable, 
+                                                    digitsColumns=4,
+                                                    set_top_padding = 5,
+                                                    set_bottom_padding = 5)
+```
+
+
+```{r, tab.id='valCompPagosTabla', tab.align='center'}
+listTablesRender
+```
+
+::: {custom-style="NotasTablasImagenes"}
+Fuente: Elaboración propia.
+:::

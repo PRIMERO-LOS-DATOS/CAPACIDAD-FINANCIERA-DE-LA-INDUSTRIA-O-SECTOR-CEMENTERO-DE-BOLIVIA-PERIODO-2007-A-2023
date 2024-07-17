@@ -1,0 +1,6 @@
+
+
+## CONCLUSIÓN
+
+
+Con base a los resultados encontrados, existe evidencia que sugiere: 1) La capacidad de endeudamiento de la industria cementera de Bolivia, haciende en promedio a Bs.- `r x1_conclusiones` mensual restringido o definido por el flujo de efectivo generado. 2) Que el comportamiento de pagos de cargos financieros del sector haciende al `r x2_conclusiones`% mensual. 3) La industria empieza afrontar nuevos retos como el hecho de disminución de activos fijos y que el pasivo por primera vez como se observa en los últimos periodos es mayor que el patrimonio, donde debe evaluarse el efecto positivo o negativo de estas medidas.
