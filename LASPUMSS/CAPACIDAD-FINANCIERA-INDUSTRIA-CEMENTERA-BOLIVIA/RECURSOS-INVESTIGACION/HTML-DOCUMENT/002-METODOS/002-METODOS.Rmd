@@ -19,9 +19,9 @@ Continuando con los detalles técnicos de la presente investigación se circunsc
 
 $$ \text{%} = \frac{Gastos \text{ } financieros}{Ingresos \text{ } operacionales}$$
 
-Seguido de la capacidad de endeudamiento que fue representado por el flujo de efectivo generado en un periodo, donde dicho efectivo se debe entender como aquellos activos más líquidos que pueden ser convertidos en dinero en un periodo menor a un mes:
+Seguido de la capacidad de endeudamiento que fue representado por el flujo de efectivo generado en un periodo (FP), donde dicho efectivo se debe entender como aquellos activos más líquidos que pueden ser convertidos en dinero en un periodo menor a un mes:
 
-$$Flujos \text{ } de \text{ } Efectivo =  \vartriangle{Activo} +  \vartriangle{Pasivo} +  \vartriangle{Patrimonio}$$
+$$FP =  \vartriangle{Activo} +  \vartriangle{Pasivo} +  \vartriangle{Patrimonio}$$
 
 Así también, la frecuencia de todas las series de tiempo es de intervalo mensual a menos que se señale lo contrario, donde los valores perdidos se interpolan por el algoritmo de intercepción de  @forecast2008.
 
