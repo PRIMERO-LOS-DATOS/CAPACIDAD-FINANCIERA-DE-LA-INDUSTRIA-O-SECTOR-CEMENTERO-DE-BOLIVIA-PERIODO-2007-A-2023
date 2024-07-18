@@ -1,8 +1,8 @@
 # CAPACIDAD FINANCIERA DE LA INDUSTRIA O SECTOR CEMENTERO DE BOLIVIA, PERIODO 2007 – 2023
 
-- [Presentación web]()
-- [Informe final (Arvivo word)]()
-- [Informe final (Arvivo pdf)]()
+- [Presentación web](https://primero-los-datos-economia-finanzas.blogspot.com/2024/07/capacidad-financiera-de-la-industria-o.html)
+- [Informe final (Arvivo word)](https://github.com/PRIMERO-LOS-DATOS/CAPACIDAD-FINANCIERA-DE-LA-INDUSTRIA-O-SECTOR-CEMENTERO-DE-BOLIVIA-PERIODO-2007-A-2023/raw/main/LASPUMSS/CAPACIDAD-FINANCIERA-INDUSTRIA-CEMENTERA-BOLIVIA/PRINCIPAL-ARTICULO-WORD.docx)
+- [Informe final (Arvivo pdf)](https://github.com/PRIMERO-LOS-DATOS/CAPACIDAD-FINANCIERA-DE-LA-INDUSTRIA-O-SECTOR-CEMENTERO-DE-BOLIVIA-PERIODO-2007-A-2023/blob/main/LASPUMSS/CAPACIDAD-FINANCIERA-INDUSTRIA-CEMENTERA-BOLIVIA/PRINCIPAL-ARTICULO-WORD.pdf)
 
 
 Este trabajo está bajo licencia 
